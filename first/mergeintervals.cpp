@@ -12,11 +12,11 @@ class Solution {
     public:
         static bool overlapped(Interval &inter1, Interval &inter2)
         {
-            if(!(inter1.start < inter2.start || inter1.start > inter2.end))
-                return true;
-            if(!(inter1.end < inter2.start || inter1.end > inter2.end))
-                return true;
-            return false;
+            if(inter1.start > inter2.end)
+                return false;
+            if(inter2.start > inter1.end)
+                return false;
+            return true;
         }
         Interval join_interval(Interval &inter1, Interval &inter2)
         {
@@ -31,13 +31,13 @@ class Solution {
         }
         vector<Interval> merge(vector<Interval>& intervals) {
             vector<Interval> result;
-            int size = intervals.size(), i, j;
+            int size = intervals.size(), i, j, found;
 
             for(i = 0;i < size;i++) {
                 Interval inter = intervals[i];
-                int found = 0;
+                found = 0;
                 for(j = 0;j < result.size();j++) {
-                    Interval &rinter = result[i];
+                    Interval rinter = result[j];
 
                     if(overlapped(inter, rinter)) {
                         result[j] = join_interval(inter, rinter);
@@ -49,6 +49,25 @@ class Solution {
                 if(found == 0)
                     result.push_back(inter);
             }
+
+            do {
+                found = 0;
+                for(i = 0;i < result.size();i++) {       
+                    for(j = i + 1;j < result.size();j++) {
+                        Interval inter = result[i]; 
+                        Interval rinter = result[j];
+
+                        printf("start:%d,end:%d\n", rinter.start, rinter.end);
+                        if(overlapped(inter, rinter)) {                
+                            result[i] = join_interval(inter, rinter);
+                            result.erase(result.begin() + j);
+                            j--;
+                            found = 1;
+                            break;;
+                        }
+                    }
+                }
+            } while(found);
             return result;
         }
 };
