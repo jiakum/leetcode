@@ -10,36 +10,36 @@
  */
 class Solution {
     public:
-        TreeNode* buildTreeUtil(vector<int>& inorder, vector<int>& postorder,int inend,int instart,int postindex) 
-        {
-            if(instart>inend)
-            {
+        TreeNode* subbuildtree(vector<int>& postorder, int start, int end, int &index) {
+            if(start > end)
                 return NULL;
-            }
 
-            TreeNode *root = new TreeNode(postorder[postindex]);
+            int i, pos, val = postorder[index];
+            pos = imap.find(val)->second;
+            if(!(pos >= start && pos <= end))
+                return NULL;
 
-            int index=0;
+            index--;
+            TreeNode *node = new TreeNode(val);
 
-            for(int i=inend;i>=instart;i--)
-            {
-                if(inorder[i]==root->val)
-                {
-                    index=i;
-                    break;                     
-                }
+            node->right = subbuildtree(postorder, pos + 1, end, index);
+            node->left  = subbuildtree(postorder, start, pos - 1, index);
 
-            }
-
-            root->right=buildTreeUtil(inorder,postorder,inend,index+1,postindex-1);
-            root->left=buildTreeUtil(inorder,postorder,index-1,instart,postindex-(inend-index)-1);
-
-            return root;
+            return node;
         }
-
         TreeNode* buildTree(vector<int>& inorder, vector<int>& postorder) {
-            TreeNode *root=buildTreeUtil(inorder,postorder,inorder.size()-1,0,postorder.size()-1);
+            int i, size = inorder.size(), index = size - 1;
 
-            return root;
+            if(size == 0)
+                return NULL;
+
+            imap.clear();
+            for(i = 0;i < size;i++) {
+                imap[inorder[i]] = i;
+            }
+
+            return subbuildtree(postorder, 0, size - 1, index);
         }
+    private:
+        map<int, int> imap;
 };
