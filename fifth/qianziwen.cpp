@@ -17,6 +17,7 @@
 
 using namespace std;
 
+#define UTF8_MAX_SIZE (0x1fffff)
 class Solution {
     enum {
         CHAR_ASCII = -2000,
@@ -110,9 +111,11 @@ class Solution {
                     GET_UTF8(num, ptr, buf);
                     result |= num;
                 } else {
+                    result = CHAR_UNKNOWN;
                     ptr++;
                 }
             } else {
+                result = *ptr;
                 ptr++;
             }
 
@@ -120,8 +123,7 @@ class Solution {
 
             return result;
         }
-        int repeatedWord(const char *filename, map<int, int> &lmap) {
-            map<int, int>::iterator iter;
+        int repeatedWord(const char *filename, unsigned int *lmap) {
             unsigned char buf[1024], *ptr;
             int fd, left = 0, len, ret;
 
@@ -151,11 +153,8 @@ class Solution {
                         case CHAR_UNKNOWN:
                             break;
                         default:
-                            iter = lmap.find(ret);
-                            if(iter == lmap.end())
-                                lmap[ret] = 1;
-                            else
-                                lmap[ret]++;
+                            if(ret > 0x7f && ret < UTF8_MAX_SIZE)
+                                lmap[ret] ++;
                             break;
                     }
                 } while(ret != CHAR_NOT_COMPLETE && ptr < buf + len);
@@ -169,8 +168,8 @@ class Solution {
 
 int main(int argc, char **argv)
 {
-    map<int, int> lmap;
-    map<int, int>::iterator iter;
+    unsigned int *lmap;
+    int i;
     Solution sol;
 
     if(argc < 2) {
@@ -178,16 +177,17 @@ int main(int argc, char **argv)
         return -EINVAL;
     }
 
+    lmap = (unsigned int *)malloc(UTF8_MAX_SIZE * sizeof(int));
+    memset(lmap, 0, UTF8_MAX_SIZE * sizeof(int));
     if(sol.repeatedWord(argv[1], lmap) < 0) {
         printf("Please check your input file\n");
         return -EINVAL;
     }
     
-    printf("parse file succes, elements:%d\n", (int)lmap.size());
-    for(iter = lmap.begin();iter != lmap.end();iter++) {
+    for(i = 0;i < UTF8_MAX_SIZE;i++) {
         unsigned char num[8];
-        if(iter->second > 1 && sol.unicodetoutf8(num, iter->first) == 0) {
-            printf("%s:%d,0x%x\n", num, iter->second, iter->first);
+        if(lmap[i] > 1 && sol.unicodetoutf8(num, i) == 0) {
+            printf("%s:%d,0x%x\n", num, lmap[i], i);
         }
     }
 
