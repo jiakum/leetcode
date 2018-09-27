@@ -161,6 +161,8 @@ class Solution {
                 } while(ret != CHAR_NOT_COMPLETE && ptr < buf + len);
             }
 
+            close(fd);
+
             return 0;
         }
 };
@@ -171,7 +173,7 @@ int main(int argc, char **argv)
     map<int, int>::iterator iter;
     Solution sol;
 
-    if(argc < 1) {
+    if(argc < 2) {
         printf("Please enter a filename\n");
         return -EINVAL;
     }
