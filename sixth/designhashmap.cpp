@@ -5,6 +5,7 @@
 #include <vector>
 #include <iostream>
 #include <map>
+#include <unordered_map>
 #include <algorithm>
 
 using namespace std;
@@ -130,16 +131,18 @@ class MyHashMap {
 int main(int argc, char **argv)
 {
     MyHashMap sol(16);
+    unordered_map<int, int> lmap(1 << 16);
     int i;
 
     srand(time(NULL));
 
     for(i = 0;i < 1000 * 1000;i++) {
         int n = rand();
-        sol.put(n, -n);
+        //sol.put(n, -n);
+        lmap[n] = n;
     }
 
-    sol.check_balance();
+    //sol.check_balance();
 
     return 0;
 }
