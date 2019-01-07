@@ -106,8 +106,8 @@ class Solution {
                     result |= num << 6;
                     GET_UTF8(num, ptr, buf);
                     result |= num;
-                } else if((*ptr++ & 0xe0) == 0xc0) {
-                    result |= (*ptr & 0x1f) << 12;
+                } else if((*ptr & 0xe0) == 0xc0) {
+                    result |= (*ptr++ & 0x1f) << 12;
                     GET_UTF8(num, ptr, buf);
                     result |= num;
                 } else {
@@ -185,9 +185,10 @@ int main(int argc, char **argv)
     }
     
     for(i = 0;i < UTF8_MAX_SIZE;i++) {
+        static int line = 0;
         unsigned char num[8];
-        if(lmap[i] > 1 && sol.unicodetoutf8(num, i) == 0) {
-            printf("%s:%d,0x%x\n", num, lmap[i], i);
+        if(lmap[i] >= 1 && sol.unicodetoutf8(num, i) == 0) {
+            printf("%d:%s:%d,0x%x\n", ++line, num, lmap[i], i);
         }
     }
 

@@ -11134,8 +11134,8 @@ int utf8tounicode(unsigned char **buf) {
             result |= num << 6;
             GET_UTF8(num, ptr, buf);
             result |= num;
-        } else if((*ptr++ & 0xe0) == 0xc0) {
-            result |= (*ptr & 0x1f) << 12;
+        } else if((*ptr & 0xe0) == 0xc0) {
+            result |= (*ptr++ & 0x1f) << 12;
             GET_UTF8(num, ptr, buf);
             result |= num;
         } else {
